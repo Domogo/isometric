@@ -23,6 +23,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ]] --
+
+---Helper function to include one table into another
+---@param to table Table to include into
+---@param from table Table to include from
+---@param seen table<table, table> Table of already seen tables to prevent infinite recursion
+---@return table result The resulting table
 local function include_helper(to, from, seen)
     if from == nil then
         return to
@@ -42,23 +48,30 @@ local function include_helper(to, from, seen)
     return to
 end
 
--- deeply copies `other' into `class'. keys in `other' that are already
--- defined in `class' are omitted
+---Deeply copies `other` into `class`. Keys in `other` that are already defined in `class` are omitted
+---@param class table The class to include into
+---@param other table The table to include from
+---@return table class The modified class
 local function include(class, other)
     return include_helper(class, other, {})
 end
 
--- returns a deep copy of `other'
+---Returns a deep copy of `other`
+---@param other table The table to clone
+---@return table clone The cloned table
 local function clone(other)
     return setmetatable(include({}, other), getmetatable(other))
 end
 
+---Creates a new class
+---@param class? table Optional base class definition
+---@return table class The created class
 local function new(class)
     -- mixins
     class = class or {} -- class can be nil
     local inc = class.__includes or {}
     if getmetatable(inc) then
-        inc = {inc}
+        inc = { inc }
     end
 
     for _, other in ipairs(inc) do
@@ -88,15 +101,30 @@ end
 -- interface for cross class-system compatibility (see https://github.com/bartbes/Class-Commons).
 if class_commons ~= false and not common then
     common = {}
+    ---Create a new class with Class Commons interface
+    ---@param name string Name of the class
+    ---@param prototype table Class prototype
+    ---@param parent? table Optional parent class
+    ---@return table class The created class
     function common.class(name, prototype, parent)
         return new {
-            __includes = {prototype, parent}
+            __includes = { prototype, parent }
         }
     end
+
+    ---Create a new instance with Class Commons interface
+    ---@param class table The class to instantiate
+    ---@param ... any Constructor arguments
+    ---@return table instance The created instance
     function common.instance(class, ...)
         return class(...)
     end
 end
+
+---@class ClassModule
+---@field new fun(class?: table): table Creates a new class
+---@field include fun(class: table, other: table): table Includes one table into another
+---@field clone fun(other: table): table Creates a deep copy of a table
 
 -- the module
 return setmetatable({

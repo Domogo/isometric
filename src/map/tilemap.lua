@@ -2,7 +2,16 @@ local iso = require('src.utils.iso')
 local Class = require('src.utils.class')
 local Tile = require('src.map.tile')
 
+---@class TileMap
+---@field width number Width of the tilemap in tiles
+---@field height number Height of the tilemap in tiles
+---@field tiles table<number, table<number, Tile>> 2D array of Tile objects
+---@field tileset table Tileset containing image and quads for rendering
 local TileMap = Class {
+  ---Initialize a new TileMap instance
+  ---@param self TileMap
+  ---@param width number Width of the tilemap in tiles
+  ---@param height number Height of the tilemap in tiles
   init = function(self, width, height)
     self.width = width
     self.height = height
@@ -34,7 +43,10 @@ local TileMap = Class {
   end
 }
 
--- Get tile at specific coordinates
+---Get tile at specific coordinates
+---@param x number The X coordinate (0-based)
+---@param y number The Y coordinate (0-based)
+---@return Tile|nil tile The tile at the specified coordinates, or nil if out of bounds
 function TileMap:getTile(x, y)
   if x >= 0 and x < self.width and y >= 0 and y < self.height then
     return self.tiles[y + 1][x + 1]
@@ -42,7 +54,12 @@ function TileMap:getTile(x, y)
   return nil
 end
 
--- Check if point is inside diamond (top face of iso cube)
+---Check if point is inside diamond (top face of iso cube)
+---@param pointX number X coordinate of the point to check
+---@param pointY number Y coordinate of the point to check
+---@param diamondCenterX number X coordinate of the diamond's center
+---@param diamondCenterY number Y coordinate of the diamond's center
+---@return boolean isInside True if the point is inside the diamond
 local function pointInDiamond(pointX, pointY, diamondCenterX, diamondCenterY)
   -- Convert point to diamond-local coordinates
   local localX = pointX - diamondCenterX
@@ -53,7 +70,11 @@ local function pointInDiamond(pointX, pointY, diamondCenterX, diamondCenterY)
   return math.abs(localX / (iso.TILE_WIDTH / 4)) + math.abs(localY / (iso.TILE_HEIGHT / 2)) <= 1
 end
 
--- Convert mouse coordinates to tile coordinates
+---Convert mouse coordinates to tile coordinates
+---@param mouseX number Mouse X coordinate in screen space
+---@param mouseY number Mouse Y coordinate in screen space
+---@return number x The tile X coordinate (0-based), -1 if no tile found
+---@return number y The tile Y coordinate (0-based), -1 if no tile found
 function TileMap:mouseToTile(mouseX, mouseY)
   -- Adjust mouse coordinates to account for isometric offset
   mouseX = mouseX - iso.TILE_WIDTH / 2
@@ -83,13 +104,17 @@ function TileMap:mouseToTile(mouseX, mouseY)
   return -1, -1 -- No tile found
 end
 
--- Set tile at specific coordinates
+---Set tile at specific coordinates
+---@param x number The X coordinate (0-based)
+---@param y number The Y coordinate (0-based)
+---@param tileId number The ID of the tile to set
 function TileMap:setTile(x, y, tileId)
   if x >= 0 and x < self.width and y >= 0 and y < self.height then
     self.tiles[y + 1][x + 1]:setTileId(tileId)
   end
 end
 
+---Draw the tilemap in isometric view
 function TileMap:draw()
   -- Calculate map center in isometric coordinates
   local mapCenterX = self.width / 2
@@ -119,6 +144,8 @@ function TileMap:draw()
   end
 end
 
+---Set the tileset used for rendering the tilemap
+---@param tileset table The tileset containing image and quads
 function TileMap:setTileset(tileset)
   self.tileset = tileset
 end
