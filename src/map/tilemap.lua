@@ -22,18 +22,25 @@ function TileMap.new(width, height)
 end
 
 function TileMap:draw()
-  -- Calculate center offset
+  -- Get screen center
   local centerX = love.graphics.getWidth() / 2
-  local centerY = love.graphics.getHeight() / 3
+  local centerY = love.graphics.getHeight() / 2
+
+  -- Calculate map center in isometric coordinates
+  local mapCenterX = self.width / 2
+  local mapCenterY = self.height / 2
+
+  -- Get screen coordinates for map center
+  local mapCenterScreenX, mapCenterScreenY = iso.isoToScreen(mapCenterX, mapCenterY)
 
   -- Draw tiles in isometric order (back to front)
   for y = 1, self.height do
     for x = 1, self.width do
-      local screenX, screenY = iso.isoToScreen(x - 1, y - 1)
+      local tileScreenX, tileScreenY = iso.isoToScreen(x - 1, y - 1)
 
-      -- Center the map and adjust for tile dimensions
-      screenX = screenX + centerX - iso.TILE_WIDTH / 4 -- Adjusted for new isometric calculations
-      screenY = screenY + centerY - iso.TILE_DEPTH     -- Account for cube height
+      -- Offset each tile by the difference between screen center and map center
+      local screenX = tileScreenX + centerX - mapCenterScreenX
+      local screenY = tileScreenY + centerY - mapCenterScreenY
 
       -- Draw the cube tile
       love.graphics.draw(
