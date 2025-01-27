@@ -35,7 +35,7 @@ function TileMap:draw()
       local tileScreenX, tileScreenY = iso.isoToScreen(x - 1, y - 1)
 
       -- Offset each tile by map center
-      local screenX = tileScreenX - mapCenterScreenX
+      local screenX = tileScreenX - mapCenterScreenX - iso.TILE_WIDTH / 2
       local screenY = tileScreenY - mapCenterScreenY
 
       -- Draw the cube tile

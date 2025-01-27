@@ -31,7 +31,7 @@ function love.load()
   local tileset = assets.loadTileset('assets/tileset.png', 32, 32)
 
   -- Create 8x8 map
-  map = TileMap.new(8, 8)
+  map = TileMap.new(9, 9)
   map:setTileset(tileset)
 end
 
