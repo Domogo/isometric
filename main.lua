@@ -54,7 +54,8 @@ function love.update(dt)
     for y = 1, map.height do
       for x = 1, map.width do
         local tile = map.tiles[y][x]
-        if tile.x == tileX and tile.y == tileY then
+        -- Only update if we found a valid tile (-1,-1 means no tile found)
+        if tileX ~= -1 and tile.x == tileX and tile.y == tileY then
           tile:setTileId(2) -- Hover state tile ID
         else
           tile:setTileId(1) -- Normal state tile ID

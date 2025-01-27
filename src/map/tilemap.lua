@@ -42,6 +42,17 @@ function TileMap:getTile(x, y)
   return nil
 end
 
+-- Check if point is inside diamond (top face of iso cube)
+local function pointInDiamond(pointX, pointY, diamondCenterX, diamondCenterY)
+  -- Convert point to diamond-local coordinates
+  local localX = pointX - diamondCenterX
+  local localY = pointY - diamondCenterY
+
+  -- For isometric tiles, the diamond shape is formed by TILE_WIDTH/2 and TILE_HEIGHT/2
+  -- This creates the exact diamond shape of the top face
+  return math.abs(localX / (iso.TILE_WIDTH / 4)) + math.abs(localY / (iso.TILE_HEIGHT / 2)) <= 1
+end
+
 -- Convert mouse coordinates to tile coordinates
 function TileMap:mouseToTile(mouseX, mouseY)
   -- Calculate map center in isometric coordinates
@@ -49,10 +60,23 @@ function TileMap:mouseToTile(mouseX, mouseY)
   local mapCenterY = self.height / 2
   local mapCenterScreenX, mapCenterScreenY = iso.isoToScreen(mapCenterX, mapCenterY)
 
-  -- Convert mouse coordinates to isometric coordinates
-  local tileX, tileY = iso.screenToIso(mouseX, mouseY, mapCenterScreenX, mapCenterScreenY)
+  -- Check each tile's top face in isometric order (back to front)
+  for y = self.height, 1, -1 do
+    for x = 1, self.width do
+      local tile = self.tiles[y][x]
+      -- Get screen coordinates exactly as in draw()
+      local tileScreenX, tileScreenY = iso.isoToScreen(tile:getPosition())
+      tileScreenX = tileScreenX - mapCenterScreenX - iso.TILE_WIDTH / 2
+      tileScreenY = tileScreenY - mapCenterScreenY
 
-  return tileX, tileY
+      -- Check if mouse is inside this tile's top face diamond
+      if pointInDiamond(mouseX, mouseY, tileScreenX, tileScreenY) then
+        return tile.x, tile.y
+      end
+    end
+  end
+
+  return -1, -1 -- No tile found
 end
 
 -- Set tile at specific coordinates
