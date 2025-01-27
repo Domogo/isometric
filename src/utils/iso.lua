@@ -1,9 +1,9 @@
 local iso = {}
 
 -- Tile dimensions (matching the actual tileset dimensions)
-iso.TILE_WIDTH = 32  -- Width of the tile
-iso.TILE_HEIGHT = 16 -- Height of the top face (half of width for isometric)
-iso.TILE_DEPTH = 32  -- Full height of the cube including sides
+iso.TILE_WIDTH = 64  -- Width of the tile
+iso.TILE_HEIGHT = 32 -- Height of the top face (half of width for isometric)
+iso.TILE_DEPTH = 64  -- Full height of the cube including sides
 
 -- Convert screen coordinates to isometric coordinates
 function iso.screenToIso(screenX, screenY)

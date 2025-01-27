@@ -4,16 +4,18 @@ require('love')
 local push = require('src.utils.push')
 local assets = require('src.utils.assets')
 local TileMap = require('src.map.tilemap')
+local TileHover = require('src.map.tile_hover')
 
 -- Physical screen dimensions
 local WINDOW_WIDTH = 1280
 local WINDOW_HEIGHT = 720
 
 -- Virtual resolution dimensions
-local VIRTUAL_WIDTH = 432
-local VIRTUAL_HEIGHT = 243
+local VIRTUAL_WIDTH = 864
+local VIRTUAL_HEIGHT = 486
 
 local map
+local hover
 
 function love.load()
   -- Initialize nearest-neighbor filter
@@ -26,13 +28,15 @@ function love.load()
     resizable = true
   })
 
-  -- Load tileset with correct tile dimensions (32x32 for cube tiles)
-  -- Width is 32 (cube width), height is 32 (includes top face + sides)
-  local tileset = assets.loadTileset('assets/tileset.png', 32, 32)
+  -- Load tileset with correct tile dimensions (64x64 for cube tiles)
+  -- Width is 64 (cube width), height is 64 (includes top face + sides)
+  local tileset = assets.loadTileset('assets/tileset64.png', 64, 64)
 
-  -- Create 8x8 map
   map = TileMap.new(9, 9)
   map:setTileset(tileset)
+
+  -- Create hover effect handler
+  hover = TileHover.new(map)
 end
 
 function love.resize(w, h)
@@ -40,6 +44,7 @@ function love.resize(w, h)
 end
 
 function love.update(dt)
+  hover:update()
 end
 
 function love.draw()
@@ -47,5 +52,6 @@ function love.draw()
   -- Translate to center of virtual resolution
   love.graphics.translate(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2)
   map:draw()
+  hover:draw()
   push:finish()
 end
