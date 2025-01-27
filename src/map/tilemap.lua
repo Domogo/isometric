@@ -55,6 +55,10 @@ end
 
 -- Convert mouse coordinates to tile coordinates
 function TileMap:mouseToTile(mouseX, mouseY)
+  -- Adjust mouse coordinates to account for isometric offset
+  mouseX = mouseX - iso.TILE_WIDTH / 2
+  mouseY = mouseY - iso.TILE_HEIGHT / 2
+
   -- Calculate map center in isometric coordinates
   local mapCenterX = self.width / 2
   local mapCenterY = self.height / 2
