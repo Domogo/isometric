@@ -7,7 +7,8 @@ local TileMap = require('src.map.tilemap')
 local map
 
 function love.load()
-  -- Load tileset with correct tile dimensions (32x32)
+  -- Load tileset with correct tile dimensions (32x32 for cube tiles)
+  -- Width is 32 (cube width), height is 32 (includes top face + sides)
   local tileset = assets.loadTileset('assets/tileset.png', 32, 32)
 
   -- Create 8x8 map
