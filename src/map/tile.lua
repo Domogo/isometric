@@ -5,6 +5,9 @@ local Tile = Class {
     self.x = x or 0
     self.y = y or 0
     self.tileId = tileId or 1 -- Default to first tile in tileset
+    -- Store global coordinates for the center of the top face
+    self.globalX = 0
+    self.globalY = 0
   end
 }
 
@@ -17,6 +20,17 @@ end
 function Tile:setPosition(x, y)
   self.x = x
   self.y = y
+end
+
+-- Get global coordinates of the top face center
+function Tile:getGlobalPosition()
+  return self.globalX, self.globalY
+end
+
+-- Set global coordinates of the top face center
+function Tile:setGlobalPosition(x, y)
+  self.globalX = x
+  self.globalY = y
 end
 
 -- Get tile ID (which tile from tileset)

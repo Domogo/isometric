@@ -8,12 +8,27 @@ local TileMap = Class {
     self.height = height
     self.tiles = {}
 
+    -- Calculate map center in isometric coordinates
+    local mapCenterX = width / 2
+    local mapCenterY = height / 2
+    local mapCenterScreenX, mapCenterScreenY = iso.isoToScreen(mapCenterX, mapCenterY)
+
     -- Initialize empty map with Tile objects
     for y = 1, height do
       self.tiles[y] = {}
       for x = 1, width do
         -- Create tile with 0-based coordinates and default tileId of 1
-        self.tiles[y][x] = Tile(x - 1, y - 1, 1)
+        local tile = Tile(x - 1, y - 1, 1)
+
+        -- Calculate global coordinates for the center of the top face
+        local tileScreenX, tileScreenY = iso.isoToScreen(x - 1, y - 1)
+        local globalX = tileScreenX - mapCenterScreenX - iso.TILE_WIDTH / 2
+        local globalY = tileScreenY - mapCenterScreenY
+
+        -- Set the global coordinates
+        tile:setGlobalPosition(globalX, globalY)
+
+        self.tiles[y][x] = tile
       end
     end
   end
