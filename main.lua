@@ -32,11 +32,11 @@ function love.load()
   -- Width is 64 (cube width), height is 64 (includes top face + sides)
   local tileset = assets.loadTileset('assets/tileset64.png', 64, 64)
 
-  map = TileMap.new(9, 9)
+  map = TileMap(9, 9)
   map:setTileset(tileset)
 
   -- Create hover effect handler
-  hover = TileHover.new(map)
+  hover = TileHover(map)
 end
 
 function love.resize(w, h)

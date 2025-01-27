@@ -1,25 +1,22 @@
 local assets = require('src.utils.assets')
 local iso = require('src.utils.iso')
+local Class = require('src.utils.class')
 
-local TileMap = {}
-TileMap.__index = TileMap
+local TileMap = Class {
+  init = function(self, width, height)
+    self.width = width
+    self.height = height
+    self.tiles = {}
 
-function TileMap.new(width, height)
-  local self = setmetatable({}, TileMap)
-  self.width = width
-  self.height = height
-  self.tiles = {}
-
-  -- Initialize empty map
-  for y = 1, height do
-    self.tiles[y] = {}
-    for x = 1, width do
-      self.tiles[y][x] = 1 -- Default to first tile
+    -- Initialize empty map
+    for y = 1, height do
+      self.tiles[y] = {}
+      for x = 1, width do
+        self.tiles[y][x] = 1 -- Default to first tile
+      end
     end
   end
-
-  return self
-end
+}
 
 function TileMap:draw()
   -- Calculate map center in isometric coordinates

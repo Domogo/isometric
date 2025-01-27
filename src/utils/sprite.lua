@@ -1,22 +1,20 @@
-local Sprite = {}
-Sprite.__index = Sprite
+local Class = require('src/utils/class')
 
--- Create a new sprite
-function Sprite.new(image, x, y, layer)
-  local self = setmetatable({}, Sprite)
-  self.image = image
-  self.x = x or 0
-  self.y = y or 0
-  self.layer = layer or 0
-  self.rotation = 0
-  self.scaleX = 1
-  self.scaleY = 1
-  self.originX = 0
-  self.originY = 0
-  self.quad = nil
-  self.animation = nil
-  return self
-end
+local Sprite = Class {
+  init = function(self, image, x, y, layer)
+    self.image = image
+    self.x = x or 0
+    self.y = y or 0
+    self.layer = layer or 0
+    self.rotation = 0
+    self.scaleX = 1
+    self.scaleY = 1
+    self.originX = 0
+    self.originY = 0
+    self.quad = nil
+    self.animation = nil
+  end
+}
 
 -- Set sprite position
 function Sprite:setPosition(x, y)
@@ -89,8 +87,10 @@ function Sprite:draw()
 end
 
 -- Sprite Manager for handling multiple sprites
-local SpriteManager = {
-  sprites = {}
+local SpriteManager = Class {
+  init = function(self)
+    self.sprites = {}
+  end
 }
 
 -- Add a sprite to the manager

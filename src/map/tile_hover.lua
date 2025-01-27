@@ -1,15 +1,13 @@
 local iso = require('src.utils.iso')
+local Class = require('src.utils.class')
 
-local TileHover = {}
-TileHover.__index = TileHover
-
-function TileHover.new(tilemap)
-  local self = setmetatable({}, TileHover)
-  self.tilemap = tilemap
-  self.hoveredTile = nil
-  self.hoverImage = love.graphics.newImage('assets/hover.png')
-  return self
-end
+local TileHover = Class {
+  init = function(self, tilemap)
+    self.tilemap = tilemap
+    self.hoveredTile = nil
+    self.hoverImage = love.graphics.newImage('assets/hover.png')
+  end
+}
 
 function TileHover:screenToTile(screenX, screenY)
   -- Get map center in screen coordinates

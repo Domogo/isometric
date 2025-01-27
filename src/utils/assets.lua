@@ -1,7 +1,40 @@
+local Class = require('src.utils.class')
+
+-- Animation class
+local Animation = Class {
+  init = function(self, tileset, frames, duration)
+    self.tileset = tileset
+    self.frames = frames
+    self.duration = duration
+    self.timer = 0
+    self.currentFrame = 1
+  end
+}
+
+function Animation:update(dt)
+  self.timer = self.timer + dt
+  if self.timer >= self.duration then
+    self.timer = self.timer - self.duration
+    self.currentFrame = self.currentFrame + 1
+    if self.currentFrame > #self.frames then
+      self.currentFrame = 1
+    end
+  end
+end
+
+function Animation:draw(x, y, r, sx, sy)
+  love.graphics.draw(
+    self.tileset.image,
+    self.tileset.quads[self.frames[self.currentFrame]],
+    x, y, r or 0, sx or 1, sy or 1
+  )
+end
+
+-- Asset management module
 local assets = {
-  images = {},       -- Store loaded images
-  animations = {},   -- Store animation data
-  tilesets = {}      -- Store tileset data
+  images = {},     -- Store loaded images
+  animations = {}, -- Store animation data
+  tilesets = {}    -- Store tileset data
 }
 
 -- Load an image and cache it
@@ -54,36 +87,7 @@ end
 
 -- Create an animation from a spritesheet
 function assets.createAnimation(tileset, frames, duration)
-  local animation = {
-    tileset = tileset,
-    frames = frames,
-    duration = duration,
-    timer = 0,
-    currentFrame = 1
-  }
-
-  -- Update animation frame
-  function animation:update(dt)
-    self.timer = self.timer + dt
-    if self.timer >= self.duration then
-      self.timer = self.timer - self.duration
-      self.currentFrame = self.currentFrame + 1
-      if self.currentFrame > #self.frames then
-        self.currentFrame = 1
-      end
-    end
-  end
-
-  -- Draw current frame
-  function animation:draw(x, y, r, sx, sy)
-    love.graphics.draw(
-      self.tileset.image,
-      self.tileset.quads[self.frames[self.currentFrame]],
-      x, y, r or 0, sx or 1, sy or 1
-    )
-  end
-
-  return animation
+  return Animation(tileset, frames, duration)
 end
 
 -- Clear all cached assets
