@@ -4,7 +4,6 @@ require('love')
 local push = require('src.utils.push')
 local assets = require('src.utils.assets')
 local TileMap = require('src.map.tilemap')
-local TileHover = require('src.map.tile_hover')
 
 -- Physical screen dimensions
 local WINDOW_WIDTH = 1280
@@ -15,7 +14,6 @@ local VIRTUAL_WIDTH = 864
 local VIRTUAL_HEIGHT = 486
 
 local map
-local hover
 
 function love.load()
   -- Initialize nearest-neighbor filter
@@ -34,9 +32,6 @@ function love.load()
 
   map = TileMap(9, 9)
   map:setTileset(tileset)
-
-  -- Create hover effect handler
-  hover = TileHover(map)
 end
 
 function love.resize(w, h)
@@ -44,7 +39,29 @@ function love.resize(w, h)
 end
 
 function love.update(dt)
-  hover:update()
+  -- Get mouse position in virtual coordinates
+  local mouseX, mouseY = push:toGame(love.mouse.getPosition())
+
+  if mouseX and mouseY then
+    -- Adjust for screen center translation
+    mouseX = mouseX - VIRTUAL_WIDTH / 2
+    mouseY = mouseY - VIRTUAL_HEIGHT / 2
+
+    -- Convert mouse position to tile coordinates
+    local tileX, tileY = map:mouseToTile(mouseX, mouseY)
+
+    -- Update hover state for all tiles
+    for y = 1, map.height do
+      for x = 1, map.width do
+        local tile = map.tiles[y][x]
+        if tile.x == tileX and tile.y == tileY then
+          tile:setTileId(2) -- Hover state tile ID
+        else
+          tile:setTileId(1) -- Normal state tile ID
+        end
+      end
+    end
+  end
 end
 
 function love.draw()
@@ -52,6 +69,5 @@ function love.draw()
   -- Translate to center of virtual resolution
   love.graphics.translate(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2)
   map:draw()
-  hover:draw()
   push:finish()
 end

@@ -42,6 +42,19 @@ function TileMap:getTile(x, y)
   return nil
 end
 
+-- Convert mouse coordinates to tile coordinates
+function TileMap:mouseToTile(mouseX, mouseY)
+  -- Calculate map center in isometric coordinates
+  local mapCenterX = self.width / 2
+  local mapCenterY = self.height / 2
+  local mapCenterScreenX, mapCenterScreenY = iso.isoToScreen(mapCenterX, mapCenterY)
+
+  -- Convert mouse coordinates to isometric coordinates
+  local tileX, tileY = iso.screenToIso(mouseX, mouseY, mapCenterScreenX, mapCenterScreenY)
+
+  return tileX, tileY
+end
+
 -- Set tile at specific coordinates
 function TileMap:setTile(x, y, tileId)
   if x >= 0 and x < self.width and y >= 0 and y < self.height then

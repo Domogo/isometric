@@ -6,10 +6,16 @@ iso.TILE_HEIGHT = 32 -- Height of the top face (half of width for isometric)
 iso.TILE_DEPTH = 64  -- Full height of the cube including sides
 
 -- Convert screen coordinates to isometric coordinates
-function iso.screenToIso(screenX, screenY)
-  local isoX = (screenX / iso.TILE_WIDTH + screenY / iso.TILE_HEIGHT) / 2
-  local isoY = (screenY / iso.TILE_HEIGHT - screenX / iso.TILE_WIDTH) / 2
-  return isoX, isoY
+function iso.screenToIso(screenX, screenY, mapCenterScreenX, mapCenterScreenY)
+  -- Adjust coordinates relative to map center
+  screenX = screenX + mapCenterScreenX + iso.TILE_WIDTH / 2
+  screenY = screenY + mapCenterScreenY
+
+  -- Convert to isometric coordinates
+  local isoX = (screenX / (iso.TILE_WIDTH / 2) + screenY / (iso.TILE_HEIGHT / 2)) / 2
+  local isoY = (screenY / (iso.TILE_HEIGHT / 2) - screenX / (iso.TILE_WIDTH / 2)) / 2
+
+  return math.floor(isoX), math.floor(isoY)
 end
 
 -- Convert isometric coordinates to screen coordinates
