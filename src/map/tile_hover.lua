@@ -20,9 +20,9 @@ function TileHover:screenToTile(screenX, screenY)
   -- Convert to isometric coordinates
   local isoX, isoY = iso.screenToIso(screenX, screenY)
 
-  -- Round to nearest tile
-  local tileX = math.floor(isoX + 1)
-  local tileY = math.floor(isoY + 1)
+  -- Round to nearest tile (convert to 0-based coordinates)
+  local tileX = math.floor(isoX)
+  local tileY = math.floor(isoY)
 
   return tileX, tileY
 end
@@ -31,9 +31,9 @@ function TileHover:update()
   local mouseX, mouseY = love.mouse.getPosition()
   local tileX, tileY = self:screenToTile(mouseX, mouseY)
 
-  -- Check if coordinates are within map bounds
-  if tileX >= 1 and tileX <= self.tilemap.width and tileY >= 1 and tileY <= self.tilemap.height then
-    self.hoveredTile = { x = tileX, y = tileY }
+  -- Check if coordinates are within map bounds (using 0-based coordinates)
+  if tileX >= 0 and tileX < self.tilemap.width and tileY >= 0 and tileY < self.tilemap.height then
+    self.hoveredTile = self.tilemap:getTile(tileX, tileY)
   else
     self.hoveredTile = nil
   end
@@ -50,7 +50,8 @@ function TileHover:draw()
   local mapCenterScreenX, mapCenterScreenY = iso.isoToScreen(mapCenterX, mapCenterY)
 
   -- Get screen coordinates for hovered tile
-  local tileScreenX, tileScreenY = iso.isoToScreen(self.hoveredTile.x - 1, self.hoveredTile.y - 1)
+  local tileX, tileY = self.hoveredTile:getPosition()
+  local tileScreenX, tileScreenY = iso.isoToScreen(tileX, tileY)
 
   -- Offset by map center
   local screenX = tileScreenX - mapCenterScreenX - iso.TILE_WIDTH / 2

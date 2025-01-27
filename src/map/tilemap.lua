@@ -1,6 +1,6 @@
-local assets = require('src.utils.assets')
 local iso = require('src.utils.iso')
 local Class = require('src.utils.class')
+local Tile = require('src.map.tile')
 
 local TileMap = Class {
   init = function(self, width, height)
@@ -8,15 +8,31 @@ local TileMap = Class {
     self.height = height
     self.tiles = {}
 
-    -- Initialize empty map
+    -- Initialize empty map with Tile objects
     for y = 1, height do
       self.tiles[y] = {}
       for x = 1, width do
-        self.tiles[y][x] = 1 -- Default to first tile
+        -- Create tile with 0-based coordinates and default tileId of 1
+        self.tiles[y][x] = Tile(x - 1, y - 1, 1)
       end
     end
   end
 }
+
+-- Get tile at specific coordinates
+function TileMap:getTile(x, y)
+  if x >= 0 and x < self.width and y >= 0 and y < self.height then
+    return self.tiles[y + 1][x + 1]
+  end
+  return nil
+end
+
+-- Set tile at specific coordinates
+function TileMap:setTile(x, y, tileId)
+  if x >= 0 and x < self.width and y >= 0 and y < self.height then
+    self.tiles[y + 1][x + 1]:setTileId(tileId)
+  end
+end
 
 function TileMap:draw()
   -- Calculate map center in isometric coordinates
@@ -29,7 +45,8 @@ function TileMap:draw()
   -- Draw tiles in isometric order (back to front)
   for y = 1, self.height do
     for x = 1, self.width do
-      local tileScreenX, tileScreenY = iso.isoToScreen(x - 1, y - 1)
+      local tile = self.tiles[y][x]
+      local tileScreenX, tileScreenY = iso.isoToScreen(tile:getPosition())
 
       -- Offset each tile by map center
       local screenX = tileScreenX - mapCenterScreenX - iso.TILE_WIDTH / 2
@@ -38,7 +55,7 @@ function TileMap:draw()
       -- Draw the cube tile
       love.graphics.draw(
         self.tileset.image,
-        self.tileset.quads[self.tiles[y][x]],
+        self.tileset.quads[tile:getTileId()],
         screenX,
         screenY
       )
